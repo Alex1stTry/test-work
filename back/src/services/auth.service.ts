@@ -31,10 +31,12 @@ class AuthService {
         }
         const tokens = await tokenService.generateToken({ id: user.id, email: user.email, role: user.role })
 
-        await tokensRepository.create(user.id, tokens)
+        const tokenPair = await tokensRepository.create(user.id, tokens)
+        const updatedUser = await userRepository.update(user.id, { token_pair_id: tokenPair.id })
 
-        return { user, tokens }
+        return { user: updatedUser, tokens }
     }
+
     public async resetPassword(payload: ITokensPayload, oldPassword: string, newPassword: string): Promise<string> {
         const user = await userRepository.findByEmail(payload.email)
 

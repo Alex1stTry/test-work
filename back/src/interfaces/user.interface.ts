@@ -10,7 +10,6 @@ export interface IUser {
     password: string;
     role: UserRoleEnum;
     created_at?: Date;
-    updated_at?: Date;
     is_Verified?: boolean;
     last_Login?: Date;
     token_pair_id?: number | ITokens;
@@ -23,7 +22,8 @@ export interface IRegisterUser extends Pick<IUser, 'username' | 'email' | 'passw
 
 export interface ILoginUser extends Pick<IUser, 'email' | 'password'> { }
 
+export interface IResponseUser extends Pick<IUser, 'id' | 'username' | 'email' | 'age' | 'avatar' | "role" | "created_at" | "last_Login"> { }
 export interface ILogin {
-    user: IUser,
+    user: IResponseUser,
     tokens: ITokensPair
 }

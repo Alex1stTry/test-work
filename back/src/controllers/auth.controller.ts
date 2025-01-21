@@ -3,6 +3,7 @@ import { authService } from "../services/auth.service";
 import { ILoginUser, IRegisterUser } from "../interfaces/user.interface";
 import { ITokensPayload } from "../interfaces/tokens.interface";
 import { UploadedFile } from "express-fileupload";
+import { UserPresenter } from "../presenter/user.presenter";
 
 
 class AuthController {
@@ -42,7 +43,8 @@ class AuthController {
         try {
             const payload = req.res.locals.payload as ITokensPayload
             const user = await authService.me(payload)
-            res.json(user)
+            const responseUser = UserPresenter.toResponse(user)
+            res.json(responseUser)
         } catch (e) {
             next(e);
         }
@@ -53,7 +55,8 @@ class AuthController {
             const payload = req.res.locals.payload as ITokensPayload
             const avatar = req.files?.file as UploadedFile
             const user = await authService.uploadAvatar(payload, avatar)
-            res.json(user)
+            const responseUser = UserPresenter.toResponse(user)
+            res.json(responseUser)
         } catch (e) {
             next(e);
         }

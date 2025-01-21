@@ -17,6 +17,7 @@ export const configs = {
     REFRESH_EXPIRES_IN: process.env.REFRESH_EXPIRES_IN,
 
     SUPABASE_URL: process.env.SUPABASE_URL,
-    SUPABASE_API_KEY: process.env.SUPABASE_API_KEY
+    SUPABASE_API_KEY: process.env.SUPABASE_API_KEY,
 
+    SUPABASE_BUCKET_URL: process.env.SUPABASE_BUCKET_URL
 }

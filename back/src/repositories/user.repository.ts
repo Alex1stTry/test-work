@@ -5,7 +5,6 @@ import { UserRoleEnum } from "../enums/user-role.enum";
 import { IUser } from "../interfaces/user.interface";
 import { UploadedFile } from "express-fileupload";
 
-
 class UserRepository {
     constructor(private supaBase = createClient(configs.SUPABASE_URL, configs.SUPABASE_API_KEY)) { }
 
@@ -92,10 +91,30 @@ class UserRepository {
         }
     }
 
+    public async update(id: number, dto: Partial<IUser>): Promise<IUser | null> {
+        try {
+            const { data, error } = await this.supaBase
+                .from('user-table')
+                .update(dto)
+                .eq('id', id)
+                .select()
+                .single();
+
+            if (error) {
+                console.error('Error finding user by email:', error.message);
+                return null;
+            }
+            return data as IUser;
+        } catch (err) {
+            console.error('Unexpected error:', err);
+            return null;
+        }
+    }
+
     public async createAvatar(path: string, file: UploadedFile): Promise<string | null> {
         try {
             const { data, error } = await this.supaBase.storage
-                .from('test')
+                .from('avatars')
                 .upload(path, file.data, {
                     upsert: true
                 });
