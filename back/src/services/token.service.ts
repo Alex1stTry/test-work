@@ -27,6 +27,13 @@ class TokenService {
             throw new ApiError(401, 'Invalid token type ')
         }
     }
+    public async generateActionToken(payload: ITokensPayload): Promise<string> {
+        return jsonwebtoken.sign(payload, configs.ACTION_TOKEN_SECRET, { expiresIn: configs.ACTION_TOKEN_EXPIRES_IN });
+    }
+
+    public checkActionToken(token: string): ITokensPayload {
+        return jsonwebtoken.verify(token, configs.ACTION_TOKEN_SECRET) as ITokensPayload
+    }
 }
 
 export const tokenService = new TokenService()

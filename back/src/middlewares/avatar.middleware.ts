@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { UploadedFile } from "express-fileupload";
 import { ApiError } from "../errors/api.eror";
+import { AvatarType } from "../types/avatar-type";
 
 class FileMiddleware {
     public isFileValid(
-        config: { MAX_SIZE: number; MIMETYPES: string[] },
+        config: AvatarType,
     ) {
         return (req: Request, res: Response, next: NextFunction) => {
             try {

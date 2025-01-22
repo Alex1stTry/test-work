@@ -4,6 +4,8 @@ import { createClient } from "@supabase/supabase-js";
 import { UserRoleEnum } from "../enums/user-role.enum";
 import { IUser } from "../interfaces/user.interface";
 import { UploadedFile } from "express-fileupload";
+import { TableNameEnum } from "../enums/table-name.enum";
+import { BucketNameEnum } from "../enums/bucket-name.enum";
 
 class UserRepository {
     constructor(private supaBase = createClient(configs.SUPABASE_URL, configs.SUPABASE_API_KEY)) { }
@@ -11,7 +13,7 @@ class UserRepository {
     public async register(dto: IRegisterUser): Promise<string | null> {
         try {
             const { data, error } = await this.supaBase
-                .from('user-table')
+                .from(TableNameEnum.USERS)
                 .insert([
                     {
                         username: dto.username,
@@ -46,7 +48,7 @@ class UserRepository {
     public async findByEmail(email: string): Promise<IUser | null> {
         try {
             const { data, error } = await this.supaBase
-                .from('user-table')
+                .from(TableNameEnum.USERS)
                 .select()
                 .eq('email', email)
                 .single();
@@ -69,7 +71,7 @@ class UserRepository {
     public async updatePasswordById(id: number, newPassword: string): Promise<string> {
         try {
             const { data, error } = await this.supaBase
-                .from('user-table')
+                .from(TableNameEnum.USERS)
                 .update({ password: newPassword })
                 .eq('id', id)
                 .select()
@@ -94,7 +96,7 @@ class UserRepository {
     public async update(id: number, dto: Partial<IUser>): Promise<IUser | null> {
         try {
             const { data, error } = await this.supaBase
-                .from('user-table')
+                .from(TableNameEnum.USERS)
                 .update(dto)
                 .eq('id', id)
                 .select()
@@ -114,7 +116,7 @@ class UserRepository {
     public async createAvatar(path: string, file: UploadedFile): Promise<string | null> {
         try {
             const { data, error } = await this.supaBase.storage
-                .from('avatars')
+                .from(BucketNameEnum.AVATAR)
                 .upload(path, file.data, {
                     upsert: true
                 });
@@ -135,7 +137,7 @@ class UserRepository {
     public async updateAvatarById(id: number, path: string): Promise<string> {
         try {
             const { error } = await this.supaBase
-                .from('user-table')
+                .from(TableNameEnum.USERS)
                 .update({ avatar: path })
                 .eq('id', id)
                 .select()
@@ -146,6 +148,58 @@ class UserRepository {
                 return null;
             }
             return "Avatar updated successfully"
+        }
+        catch (err) {
+            console.error('Unexpected error:', err);
+            return null;
+        }
+    }
+    public async getMyGallarey(path: string): Promise<string[] | null> {
+        try {
+            const { data, error } = await this.supaBase.storage
+                .from(BucketNameEnum.AVATAR)
+                .list(path, { limit: 20 })
+            if (error) {
+                console.error('Error finding user by email:', error.message);
+                return null;
+            }
+            return data ? data.map((file) => file.name) : null
+        }
+        catch (err) {
+            console.error('Unexpected error:', err);
+            return null;
+        }
+    }
+
+    public async deleteAvatarById(id: number): Promise<string> {
+        try {
+            const { error } = await this.supaBase
+                .from(TableNameEnum.USERS)
+                .update({ avatar: null })
+                .eq('id', id)
+                .select()
+                .single(); if (error) {
+                    console.error('Error finding user by email:', error.message);
+                    return null;
+                }
+            return "Avatar deleted successfully"
+        }
+        catch (err) {
+            console.error('Unexpected error:', err);
+            return null;
+        }
+    }
+    public async deleteAvatar(userId: number, fileName: string): Promise<string> {
+        try {
+            const path = `avatar/${userId}/${fileName}`
+            const { error } = await this.supaBase.storage
+                .from(BucketNameEnum.AVATAR)
+                .remove([path])
+            if (error) {
+                console.error('Error deleting avatar:', error.message);
+                return null;
+            }
+            return "Avatar deleted successfully"
         }
         catch (err) {
             console.error('Unexpected error:', err);

@@ -23,7 +23,12 @@ export interface IRegisterUser extends Pick<IUser, 'username' | 'email' | 'passw
 export interface ILoginUser extends Pick<IUser, 'email' | 'password'> { }
 
 export interface IResponseUser extends Pick<IUser, 'id' | 'username' | 'email' | 'age' | 'avatar' | "role" | "created_at" | "last_Login"> { }
+
+export interface IResponseUserWithTokens extends IResponseUser {
+    tokens: ITokensPair
+}
+
 export interface ILogin {
-    user: IResponseUser,
+    user: IUser,
     tokens: ITokensPair
 }

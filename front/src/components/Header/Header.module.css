@@ -1,0 +1,22 @@
+.Header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: gray;
+    padding: 0 2vw 0 2vw;
+    height: 10vh
+}
+
+.Header h1 {
+    color: black;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.buttons button {
+    height: 4vh;
+    width: 6vw;
+}

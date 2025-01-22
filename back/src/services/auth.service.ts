@@ -7,6 +7,7 @@ import { tokensRepository } from "../repositories/tokens.repository";
 import { ITokensPayload } from "../interfaces/tokens.interface";
 import { IUser } from "../interfaces/user.interface";
 import { UploadedFile } from "express-fileupload";
+import { sendMailService } from "./send-grid.service";
 
 class AuthService {
     public async register(dto: IRegisterUser): Promise<string> {
@@ -62,6 +63,25 @@ class AuthService {
         await userRepository.createAvatar(path, avatar)
 
         return await userRepository.findByEmail(payload.email)
+    }
+
+    public async getMyGallarey(payload: ITokensPayload): Promise<string[]> {
+        const path = `avatar/${payload.id}/`
+        return await userRepository.getMyGallarey(path)
+    }
+
+    public async sendMail(payload: ITokensPayload): Promise<string> {
+        const actionToken = await tokenService.generateActionToken({ id: payload.id, email: payload.email, role: payload.role })
+        const user = await userRepository.findByEmail(payload.email)
+
+        await sendMailService.sendByType(payload.email, user.username, actionToken)
+        return "Check your email"
+    }
+    public async deleteAvatar(payload: ITokensPayload, fileName: string): Promise<string> {
+        const user = await userRepository.findByEmail(payload.email)
+        await userRepository.deleteAvatarById(user.id)
+        await userRepository.deleteAvatar(user.id, fileName)
+        return "Avatar deleted"
     }
 }
 export const authService = new AuthService()

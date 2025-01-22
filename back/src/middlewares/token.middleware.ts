@@ -29,7 +29,27 @@ class TokenMiddleware {
         catch (e) {
             next(e);
         }
+
+    }
+    public async checkActionToken(req: Request, res: Response, next: NextFunction) {
+        try {
+            const actionToken = req.headers.authorization
+            if (!actionToken) {
+                throw new ApiError(401, 'Token isn`t provided');
+            }
+
+            const payload = tokenService.checkActionToken(actionToken)
+            if (!payload) {
+                throw new ApiError(401, 'Invalid token')
+            }
+
+            req.res.locals.payload = payload as ITokensPayload
+            next()
+        } catch (e) {
+            next(e);
+        }
     }
 }
+
 
 export const tokenMiddleware = new TokenMiddleware()
